@@ -22,14 +22,19 @@ public class ContaAcessoEntity {
     @Id
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 255)
-    private String emailCorporativo;
+    /** Índice opaco p/ login por e-mail sem guardar o e-mail em claro. */
+    @Column(name = "chave_indice_busca_email", nullable = false, unique = true, length = 64)
+    private String chaveIndiceBuscaEmailCorporativo;
 
-    @Column(nullable = false, length = 200)
-    private String hashSenha;
+    @Column(name = "material_email_cifrado", nullable = false, length = 2048)
+    private String materialEmailCorporativoCifrado;
 
-    @Column(nullable = false, length = 120)
-    private String nomeApresentacao;
+    @Column(name = "material_nome_completo_cifrado", nullable = false, length = 4096)
+    private String materialNomeCompletoCifrado;
+
+    /** BCrypt da senha, ainda cifrado em repouso (camada extra). */
+    @Column(name = "material_hash_senha_cifrado", nullable = false, length = 1024)
+    private String materialHashSenhaBcryptCifrado;
 
     @Column(nullable = false)
     private boolean ativo;

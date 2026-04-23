@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import com.authcore.modulo.autenticacao.aplicacao.AutenticacaoService;
 import com.authcore.modulo.autenticacao.aplicacao.comando.CredenciaisEntrada;
+import com.authcore.modulo.autenticacao.aplicacao.comando.DadosCadastroNovaContaAcesso;
 import com.authcore.modulo.autenticacao.aplicacao.comando.DadosRedefinicaoSenha;
 import com.authcore.modulo.autenticacao.aplicacao.comando.RespostaSessaoAcesso;
 import jakarta.validation.Valid;
@@ -24,6 +25,12 @@ public class AutenticacaoController {
     @PostMapping("/entrar")
     public RespostaSessaoAcesso entrar(@Valid @RequestBody CredenciaisEntrada corpo) {
         return autenticacaoService.entrarComCredenciais(corpo);
+    }
+
+    @PostMapping("/registrar")
+    @ResponseStatus(HttpStatus.CREATED)
+    public RespostaSessaoAcesso registrar(@Valid @RequestBody DadosCadastroNovaContaAcesso corpo) {
+        return autenticacaoService.registrarNovaContaAcesso(corpo);
     }
 
     @PostMapping("/solicitar-redefinicao-senha")

@@ -13,12 +13,12 @@ public interface SolicitacaoRedefinicaoJpaRepositorio extends JpaRepository<Soli
     @Query(
             """
             SELECT s FROM SolicitacaoRedefinicaoSenhaEntity s
-            WHERE s.tokenOpacoUsoUnico = :token
+            WHERE s.indiceBuscaTokenRedefinicao = :indice
             AND s.consumido = false
             AND s.expiraEm > :agora
             """)
-    Optional<SolicitacaoRedefinicaoSenhaEntity> findAtivoPorToken(
-            @Param("token") String token, @Param("agora") Instant agora);
+    Optional<SolicitacaoRedefinicaoSenhaEntity> findAtivoPorIndiceToken(
+            @Param("indice") String indice, @Param("agora") Instant agora);
 
     @Modifying
     @Query("UPDATE SolicitacaoRedefinicaoSenhaEntity s SET s.consumido = true WHERE s.id = :id")

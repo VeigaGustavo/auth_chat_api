@@ -16,6 +16,7 @@ import com.authcore.modulo.autenticacao.dominio.PapelAcessoSistema;
 import com.authcore.modulo.autenticacao.dominio.SolicitacaoRedefinicaoSenhaPendente;
 import com.authcore.modulo.autenticacao.dominio.SolicitacaoRedefinicaoSenhaRepositorio;
 import com.authcore.modulo.autenticacao.aplicacao.comando.CredenciaisEntrada;
+import com.authcore.modulo.autenticacao.aplicacao.comando.DadosCadastroNovaContaAcesso;
 import com.authcore.modulo.autenticacao.aplicacao.comando.DadosRedefinicaoSenha;
 import com.authcore.modulo.autenticacao.aplicacao.comando.RespostaSessaoAcesso;
 import lombok.RequiredArgsConstructor;
@@ -45,22 +46,54 @@ public class AutenticacaoService {
         if (!portaCodificadorSenha.corresponde(credenciais.senhaAcesso(), conta.getHashSenha())) {
             throw new CredenciaisInvalidasException();
         }
+        return montarRespostaSessao(conta);
+    }
+
+    @Transactional
+    public RespostaSessaoAcesso registrarNovaContaAcesso(DadosCadastroNovaContaAcesso dados) {
+        String email = dados.emailCorporativo().trim().toLowerCase();
+        if (contaAcessoRepositorio.buscarPorEmailCorporativo(email).isPresent()) {
+            throw new RegraNegocioException("Este e-mail corporativo já está cadastrado.");
+        }
+        PapelAcessoSistema nivel = dados.nivelPapelAcessoOpcional() != null
+                ? dados.nivelPapelAcessoOpcional()
+                : PapelAcessoSistema.USUARIO_CONVIDADO;
+        if (nivel != PapelAcessoSistema.USUARIO_CONVIDADO) {
+            throw new RegraNegocioException(
+                    "Somente o papel USUARIO_CONVIDADO pode ser definido neste cadastro público.");
+        }
+        var nova = ContaAcesso.builder()
+                .id(UUID.randomUUID())
+                .emailCorporativo(email)
+                .hashSenha(portaCodificadorSenha.codificar(dados.senhaAcesso()))
+                .nomeCompletoTitular(dados.nomeCompletoTitular().trim())
+                .ativo(true)
+                .nivelPapelAcesso(nivel)
+                .build();
+        var salva = contaAcessoRepositorio.salvar(nova);
+        return montarRespostaSessao(salva);
+    }
+
+    private RespostaSessaoAcesso montarRespostaSessao(ContaAcesso conta) {
         String token = portaProvedorTokenAcesso.emitirToken(conta);
         int segundos = Math.max(1, Math.toIntExact(portaProvedorTokenAcesso.validadeAproximadaEmSegundos()));
         var papeis = conta.getNivelPapelAcesso() != null
                 ? conta.getNivelPapelAcesso()
                 : PapelAcessoSistema.USUARIO_CONVIDADO;
         return new RespostaSessaoAcesso(
-                token, "Bearer", segundos, papeis.name(), papeis.listarNomesChavePermissoes());
+                token,
+                "Bearer",
+                segundos,
+                papeis.name(),
+                papeis.listarNomesChavePermissoes(),
+                conta.getNomeCompletoTitular());
     }
 
-    // Evitar acoplamento: extrair duração via propriedades se necessário; valor fixo documentado
     @Transactional
     public void solicitarRedefinicaoSenhaPeloEmail(String emailCorporativo) {
         var opt = contaAcessoRepositorio.buscarPorEmailCorporativo(
                 emailCorporativo == null ? "" : emailCorporativo.trim().toLowerCase());
         if (opt.isEmpty()) {
-            // Não vaza existência de e-mail; apenas loga em nível de debug.
             log.debug("Redefinição pedida para e-mail ausente: {}", emailCorporativo);
             return;
         }
@@ -99,7 +132,7 @@ public class AutenticacaoService {
                 .id(conta.getId())
                 .emailCorporativo(conta.getEmailCorporativo())
                 .hashSenha(portaCodificadorSenha.codificar(dados.novaSenhaAcesso()))
-                .nomeApresentacao(conta.getNomeApresentacao())
+                .nomeCompletoTitular(conta.getNomeCompletoTitular())
                 .ativo(conta.isAtivo())
                 .nivelPapelAcesso(
                         conta.getNivelPapelAcesso() != null

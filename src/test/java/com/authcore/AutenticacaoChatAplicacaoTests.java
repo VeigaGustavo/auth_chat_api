@@ -11,9 +11,11 @@ import org.springframework.test.context.TestPropertySource;
             "spring.datasource.username=sa",
             "spring.datasource.password=",
             "spring.jpa.hibernate.ddl-auto=create-drop",
+            "spring.flyway.enabled=false",
             "acesso.cors.origens=*",
             "acesso.jwt.chaveAssinatura=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
             "acesso.jwt.duracaoValidadeMilis=900000",
+            "acesso.repouso.segredoMestreArmazenamento=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
         })
 class AutenticacaoChatAplicacaoTests {
 

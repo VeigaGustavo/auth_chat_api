@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ContaAcessoJpaRepositorio extends JpaRepository<ContaAcessoEntity, UUID> {
 
-    Optional<ContaAcessoEntity> findByEmailCorporativo(String emailCorporativo);
+    Optional<ContaAcessoEntity> findByChaveIndiceBuscaEmailCorporativo(String chaveIndiceBuscaEmailCorporativo);
 }

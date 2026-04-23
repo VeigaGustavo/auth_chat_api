@@ -7,4 +7,5 @@ public record RespostaSessaoAcesso(
         String esquemaAutorizacao,
         int expiraAproximadaEmSegundos,
         String nivelPapelAcesso,
-        List<String> permissoesAcessoEfetivas) {}
+        List<String> permissoesAcessoEfetivas,
+        String nomeCompletoTitular) {}

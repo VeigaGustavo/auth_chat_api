@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 import com.authcore.modulo.autenticacao.dominio.ContaAcesso;
 import com.authcore.modulo.autenticacao.dominio.ContaAcessoRepositorio;
+import com.authcore.modulo.autenticacao.adaptador.seguranca.ServicoIndiceDeterministicoRepouso;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -13,10 +14,13 @@ public class ContaAcessoJpaAdapter implements ContaAcessoRepositorio {
 
     private final ContaAcessoJpaRepositorio jpa;
     private final MapeadorContaAcessoJpa mapeador;
+    private final ServicoIndiceDeterministicoRepouso indices;
 
     @Override
     public Optional<ContaAcesso> buscarPorEmailCorporativo(String emailCorporativo) {
-        return jpa.findByEmailCorporativo(emailCorporativo).map(mapeador::paraDominio);
+        String norm = emailCorporativo == null ? "" : emailCorporativo.trim().toLowerCase();
+        String chave = indices.indiceParaEmailNormalizado(norm);
+        return jpa.findByChaveIndiceBuscaEmailCorporativo(chave).map(mapeador::paraDominio);
     }
 
     @Override

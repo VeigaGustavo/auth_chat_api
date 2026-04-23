@@ -36,7 +36,7 @@ public class JwtProvedorTokenAcesso implements PortaProvedorTokenAcesso {
                 : PapelAcessoSistema.USUARIO_CONVIDADO;
         return Jwts.builder()
                 .setSubject(contaAcesso.getId().toString())
-                .claim(CLAIM_NOME_EXIBICAO, contaAcesso.getNomeApresentacao())
+                .claim(CLAIM_NOME_EXIBICAO, contaAcesso.nomeParaExibicaoPublica())
                 .claim(CLAIM_NIVEL_PAPEL_ACESSO, nivel.name())
                 .claim(CLAIM_PERMISSOES_ACESSO, nivel.listarNomesChavePermissoes())
                 .setIssuedAt(new Date())

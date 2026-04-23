@@ -5,16 +5,13 @@ import java.util.UUID;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(
-        name = "solicitacao_redefinicao_senha",
-        indexes = @Index(name = "idx_solicitacao_token", columnList = "tokenOpacoUsoUnico", unique = true))
+@Table(name = "solicitacao_redefinicao_senha")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,8 +23,9 @@ public class SolicitacaoRedefinicaoSenhaEntity {
     @Column(nullable = false)
     private UUID idContaProprietaria;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String tokenOpacoUsoUnico;
+    /** Índice opaco do token (nunca o token em claro). */
+    @Column(nullable = false, unique = true, length = 64)
+    private String indiceBuscaTokenRedefinicao;
 
     @Column(nullable = false)
     private Instant expiraEm;
