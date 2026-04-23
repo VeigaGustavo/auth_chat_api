@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  banco:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: authcore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"

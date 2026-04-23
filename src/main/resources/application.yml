@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: auth-chat-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/chat}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+acesso:
+  jwt:
+    # Mínimo 32 caracteres (256 bits) para HS256; sobrescreva em produção.
+    chaveAssinatura: ${JWT_CHAVE:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
+    duracaoValidadeMilis: ${JWT_DURACAO_MS:900000}
+  cors:
+    origens: ${CORS_ORIGENS:http://localhost:*,http://127.0.0.1:*}
+
+logging:
+  level:
+    com.authcore: INFO
